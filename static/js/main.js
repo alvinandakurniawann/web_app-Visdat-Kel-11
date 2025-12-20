@@ -25,9 +25,9 @@ function updateYear(year) {
     
     // Update map
     if (typeof mapModule !== 'undefined' && mapModule.updateMap) {
-        mapModule.updateMap(config.currentYear, config.currentBenefitType);
+        mapModule.updateMap(config.currentYear, config.selectedMapBenefitTypes || config.benefitTypes);
     } else if (typeof updateMap === 'function') {
-        updateMap(config.currentYear, config.currentBenefitType);
+        updateMap(config.currentYear, config.selectedMapBenefitTypes || config.benefitTypes);
     }
     
     // Update charts
@@ -35,21 +35,30 @@ function updateYear(year) {
 }
 
 /**
- * Update benefit type for map
+ * Update benefit types for map (from checkboxes)
  */
-function updateBenefitType(benefitType) {
+function updateMapBenefitTypes() {
     if (typeof config === 'undefined') {
         console.error('Config not loaded yet');
         return;
     }
     
-    config.currentBenefitType = benefitType;
+    // Get selected benefit types from map checkboxes
+    const checkboxes = document.querySelectorAll('.map-benefit-checkbox:checked');
+    if (checkboxes.length > 0) {
+        config.selectedMapBenefitTypes = Array.from(checkboxes).map(cb => cb.value);
+    } else {
+        // If no checkbox selected, use empty array (don't auto-check)
+        config.selectedMapBenefitTypes = [];
+    }
+    
+    console.log('Map benefit types updated:', config.selectedMapBenefitTypes);
     
     // Update map
     if (typeof mapModule !== 'undefined' && mapModule.updateMap) {
-        mapModule.updateMap(config.currentYear, config.currentBenefitType);
+        mapModule.updateMap(config.currentYear, config.selectedMapBenefitTypes);
     } else if (typeof updateMap === 'function') {
-        updateMap(config.currentYear, config.currentBenefitType);
+        updateMap(config.currentYear, config.selectedMapBenefitTypes);
     }
 }
 
@@ -94,10 +103,13 @@ function updateChart() {
         return;
     }
     
-    // Get selected benefit types from checkboxes
+    // Get selected benefit types from chart checkboxes
     const checkboxes = document.querySelectorAll('.benefit-checkbox:checked');
     if (checkboxes.length > 0) {
         config.selectedBenefitTypes = Array.from(checkboxes).map(cb => cb.value);
+    } else {
+        // If no checkbox selected, use empty array (don't auto-check)
+        config.selectedBenefitTypes = [];
     }
     
     // Reload chart data
@@ -110,7 +122,7 @@ function updateChart() {
 
 // Make functions globally available immediately
 window.updateYear = updateYear;
-window.updateBenefitType = updateBenefitType;
+window.updateMapBenefitTypes = updateMapBenefitTypes;
 window.updateLocalAuthority = updateLocalAuthority;
 window.updateChart = updateChart;
 

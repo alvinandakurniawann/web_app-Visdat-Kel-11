@@ -28,13 +28,34 @@ class APIController:
         """Get data for map visualization"""
         try:
             year = int(request.args.get('year', 2025))
-            benefit_type = request.args.get('benefit_type', 'physical_activity')
+            benefit_types = request.args.getlist('benefit_types')
             
-            data = self.data_loader.get_data_for_map(year, benefit_type)
+            # If no benefit_types provided, return empty data
+            if not benefit_types:
+                return jsonify({
+                    'success': True,
+                    'data': []
+                })
+            
+            # Get data for each benefit type and aggregate
+            all_data = {}
+            for benefit_type in benefit_types:
+                data = self.data_loader.get_data_for_map(year, benefit_type)
+                for item in data:
+                    la = item['local_authority']
+                    if la not in all_data:
+                        all_data[la] = 0.0
+                    all_data[la] += item['value']
+            
+            # Convert to list format
+            result_data = [
+                {'local_authority': la, 'value': value}
+                for la, value in all_data.items()
+            ]
             
             return jsonify({
                 'success': True,
-                'data': data
+                'data': result_data
             })
         except Exception as e:
             return jsonify({

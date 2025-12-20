@@ -135,12 +135,32 @@ async function loadChartData() {
     const localAuthority = config.currentLocalAuthority;
     const benefitTypes = config.selectedBenefitTypes;
     
+    // If no benefit types selected, don't load data
+    if (!benefitTypes || benefitTypes.length === 0) {
+        // Clear charts
+        if (lineChart) {
+            lineChart.data.labels = [];
+            lineChart.data.datasets = [];
+            lineChart.update();
+        }
+        if (areaChart) {
+            areaChart.data.labels = [];
+            areaChart.data.datasets = [];
+            areaChart.update();
+        }
+        updateBreakEvenInfo(null);
+        return;
+    }
+    
     try {
         // Load time series data
-        const chartParams = new URLSearchParams({
-            local_authority: localAuthority,
-            ...Object.fromEntries(benefitTypes.map(bt => ['benefit_types', bt]))
-        });
+        const chartParams = new URLSearchParams();
+        chartParams.append('local_authority', localAuthority);
+        if (benefitTypes && Array.isArray(benefitTypes)) {
+            benefitTypes.forEach(bt => {
+                chartParams.append('benefit_types', bt);
+            });
+        }
         
         const chartResponse = await fetch(`/api/chart-data?${chartParams}`);
         const chartResult = await chartResponse.json();
@@ -150,10 +170,13 @@ async function loadChartData() {
         }
         
         // Load cumulative data
-        const cumulParams = new URLSearchParams({
-            local_authority: localAuthority,
-            ...Object.fromEntries(benefitTypes.map(bt => ['benefit_types', bt]))
-        });
+        const cumulParams = new URLSearchParams();
+        cumulParams.append('local_authority', localAuthority);
+        if (benefitTypes && Array.isArray(benefitTypes)) {
+            benefitTypes.forEach(bt => {
+                cumulParams.append('benefit_types', bt);
+            });
+        }
         
         const cumulResponse = await fetch(`/api/cumulative-data?${cumulParams}`);
         const cumulResult = await cumulResponse.json();

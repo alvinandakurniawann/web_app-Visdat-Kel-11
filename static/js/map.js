@@ -6,7 +6,7 @@
 let map;
 let geojsonLayer;
 let currentYear;
-let currentBenefitType;
+let currentBenefitTypes;
 let matchingProperty;
 let selectedLayer = null; // Layer untuk highlight selected area
 let legendControl = null; // Reference to legend control
@@ -24,11 +24,11 @@ function initMap() {
     // Initialize config values
     if (typeof config !== 'undefined') {
         currentYear = config.currentYear || 2025;
-        currentBenefitType = config.currentBenefitType || 'physical_activity';
+        currentBenefitTypes = config.selectedMapBenefitTypes || ['air_quality'];
         matchingProperty = config.matchingProperty;
     } else {
         currentYear = 2025;
-        currentBenefitType = 'physical_activity';
+        currentBenefitTypes = ['air_quality'];
     }
     
     // Initialize Leaflet map centered on UK
@@ -53,14 +53,23 @@ async function loadMapData() {
         const geojsonResponse = await fetch('/api/geojson');
         const geojson = await geojsonResponse.json();
         
-        // Load map data
-        const dataResponse = await fetch(
-            `/api/map-data?year=${currentYear}&benefit_type=${currentBenefitType}`
-        );
+        // Load map data with multiple benefit types
+        const params = new URLSearchParams({
+            year: currentYear
+        });
+        
+        // Only add benefit types if there are any selected
+        if (currentBenefitTypes && currentBenefitTypes.length > 0) {
+            currentBenefitTypes.forEach(bt => {
+                params.append('benefit_types', bt);
+            });
+        }
+        
+        const dataResponse = await fetch(`/api/map-data?${params}`);
         const result = await dataResponse.json();
         
         if (result.success) {
-            renderMap(geojson, result.data);
+            renderMap(geojson, result.data || []);
         }
         return Promise.resolve();
     } catch (error) {
@@ -87,16 +96,22 @@ function renderMap(geojson, data) {
     
     // Create data lookup map
     const dataMap = {};
-    data.forEach(item => {
-        dataMap[normalizeName(item.local_authority)] = item.value;
-    });
+    let maxValue = 0;
+    let minValue = 0;
+    
+    if (data && data.length > 0) {
+        data.forEach(item => {
+            dataMap[normalizeName(item.local_authority)] = item.value;
+        });
+        
+        // Find max value for color scaling
+        const values = data.map(d => d.value);
+        maxValue = Math.max(...values.map(v => Math.abs(v)));
+        minValue = Math.min(...values);
+    }
     
     // Store dataMap globally for resetting styles
     mapDataMap = dataMap;
-    
-    // Find max value for color scaling
-    const maxValue = Math.max(...data.map(d => Math.abs(d.value)));
-    const minValue = Math.min(...data.map(d => d.value));
     
     // Create color function
     function getColor(value) {
@@ -300,6 +315,16 @@ function showPopupForArea(layer, propValue, value) {
     
     const valueText = value !== undefined && value !== null ? value.toFixed(2) : 'N/A';
     
+    // Create label for benefit types
+    let benefitLabel = '';
+    if (typeof config !== 'undefined' && config.benefitLabels && currentBenefitTypes) {
+        if (currentBenefitTypes.length === 1) {
+            benefitLabel = config.benefitLabels[currentBenefitTypes[0]] || currentBenefitTypes[0];
+        } else {
+            benefitLabel = 'Total (' + currentBenefitTypes.map(bt => config.benefitLabels[bt] || bt).join(' + ') + ')';
+        }
+    }
+    
     // Create and show popup
     const popup = L.popup({
         className: 'non-interactive-popup',
@@ -308,7 +333,7 @@ function showPopupForArea(layer, propValue, value) {
         closeButton: false
     })
         .setLatLng(center)
-        .setContent(`<b>${propValue}</b><br>Value: ${valueText}`)
+        .setContent(`<b>${propValue}</b><br>${benefitLabel ? benefitLabel + ': ' : ''}${valueText}`)
         .openOn(map);
     
     currentPopup = popup;
@@ -416,16 +441,19 @@ function focusToSelectedArea() {
 }
 
 /**
- * Update map when year or benefit type changes
+ * Update map when year or benefit types change
  */
-function updateMap(year, benefitType) {
+function updateMap(year, benefitTypes) {
     currentYear = year;
-    currentBenefitType = benefitType;
+    currentBenefitTypes = Array.isArray(benefitTypes) ? benefitTypes : [benefitTypes];
+    
+    console.log('Updating map with year:', currentYear, 'benefitTypes:', currentBenefitTypes);
     
     // Store current selected LA before reloading
     const prevSelectedLA = currentSelectedLA || (typeof config !== 'undefined' ? config.currentLocalAuthority : null);
     
     loadMapData().then(() => {
+        console.log('Map data loaded successfully');
         // Restore highlight after map reloads (without panning)
         if (prevSelectedLA) {
             setTimeout(() => {
@@ -475,8 +503,17 @@ function addLegend(minValue, maxValue) {
         div.style.borderRadius = '5px';
         div.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.2)';
         
-        const benefitLabel = typeof config !== 'undefined' && config.benefitLabels ? 
-            config.benefitLabels[currentBenefitType] : currentBenefitType;
+        // Create label for multiple benefit types
+        let benefitLabel = '';
+        if (typeof config !== 'undefined' && config.benefitLabels && currentBenefitTypes) {
+            if (currentBenefitTypes.length === 1) {
+                benefitLabel = config.benefitLabels[currentBenefitTypes[0]] || currentBenefitTypes[0];
+            } else {
+                benefitLabel = currentBenefitTypes.map(bt => config.benefitLabels[bt] || bt).join(' + ');
+            }
+        } else {
+            benefitLabel = currentBenefitTypes ? currentBenefitTypes.join(' + ') : 'Multiple Parameters';
+        }
         
         // Get value for selected local authority if any
         let selectedValueText = '';
@@ -484,9 +521,10 @@ function addLegend(minValue, maxValue) {
             const normalizedName = normalizeName(currentSelectedLA);
             const value = mapDataMap[normalizedName];
             if (value !== undefined) {
-                selectedValueText = `<div class="legend-selected" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #ccc;">
+                selectedValueText = `                <div class="legend-selected" style="margin-top: 8px; padding-top: 8px; border-top: 1px solid #ccc;">
                     <strong>Terpilih:</strong> ${currentSelectedLA}<br>
-                    <strong>Nilai:</strong> ${value.toFixed(2)}
+                    <strong>Nilai:</strong> ${value.toFixed(2)}<br>
+                    <small style="color: #666; font-size: 0.85em;">${benefitLabel || 'Total dari parameter terpilih'}</small>
                 </div>`;
             }
         }

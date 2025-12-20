@@ -16,12 +16,17 @@
         </div>
         
         <div class="control-group">
-            <label for="benefit-type-select">Parameter Peta:</label>
-            <select id="benefit-type-select" onchange="updateBenefitType(this.value)">
+            <label>Parameter Peta:</label>
+            <div class="checkbox-group">
                 {% for bt, label in benefit_labels.items() %}
-                <option value="{{ bt }}">{{ label }}</option>
+                <label class="checkbox-label">
+                    <input type="checkbox" class="map-benefit-checkbox" 
+                           value="{{ bt }}" {% if bt == 'air_quality' %}checked{% endif %}
+                           onchange="updateMapBenefitTypes()">
+                    {{ label }}
+                </label>
                 {% endfor %}
-            </select>
+            </div>
         </div>
         
         <div class="control-group">
@@ -58,7 +63,8 @@
         </div>
         <div id="map" class="map-container"></div>
         <p class="map-note">
-            <strong>Catatan:</strong> Klik pada wilayah di peta untuk memilih Local Authority. Wilayah terpilih akan ditandai dengan warna orange.
+            <strong>Catatan:</strong> Klik pada wilayah di peta untuk memilih Local Authority. Wilayah terpilih akan ditandai dengan warna orange.<br>
+            <strong>Penjelasan Nilai:</strong> Nilai yang ditampilkan di peta adalah jumlah dari semua parameter yang dipilih. Jika hanya satu parameter dipilih, nilai tersebut adalah nilai untuk parameter tersebut saja. Jika beberapa parameter dipilih, nilai adalah jumlah dari semua parameter tersebut (benefit ditambah, cost dikurangi).
         </p>
     </section>
     
@@ -88,9 +94,10 @@ const config = {
     minYear: {{ min_year }},
     maxYear: {{ max_year }},
     currentYear: {{ min_year }},
-    currentBenefitType: '{{ benefit_types[0] }}',
+    currentBenefitTypes: {{ benefit_types | tojson }},
     currentLocalAuthority: '{{ local_authorities[0] }}',
-    selectedBenefitTypes: {{ benefit_types | tojson }}
+    selectedBenefitTypes: {{ benefit_types | tojson }},
+    selectedMapBenefitTypes: ['air_quality']
 };
 </script>
 
