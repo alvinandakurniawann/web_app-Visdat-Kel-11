@@ -11,13 +11,13 @@ class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'dev-secret-key-change-in-production'
     DEBUG = os.environ.get('FLASK_DEBUG', 'True').lower() == 'true'
     
-    # Base directory
-    BASE_DIR = Path(__file__).parent.parent
+    # Base directory (root workspace)
+    BASE_DIR = Path(__file__).parent
     
-    # Data paths
-    DATA_DIR = BASE_DIR / 'Web version'
+    # Data paths - file Excel dan GeoJSON ada di folder data
+    DATA_DIR = BASE_DIR / 'data'
     EXCEL_FILE = DATA_DIR / 'hasil_normalisasi_kel11.xlsx'
-    GEOJSON_FILE = BASE_DIR / 'lad.geojson'
+    GEOJSON_FILE = DATA_DIR / 'lad.geojson'
     
     # Data sheet names
     DATA_SHEET = 'normalized'

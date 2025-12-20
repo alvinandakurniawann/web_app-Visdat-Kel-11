@@ -42,3 +42,7 @@ Thumbs.db
 .env
 .env.local
 
+# Documentation
+INSTALLATION.md
+COMPLIANCE_CHECK.md
+

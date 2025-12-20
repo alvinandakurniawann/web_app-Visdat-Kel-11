@@ -314,7 +314,7 @@ function updateAreaChart(data) {
 function updateBreakEvenInfo(year) {
     const infoDiv = document.getElementById('break-even-info');
     if (year) {
-        infoDiv.innerHTML = `📊 Tahun Break-Even: <strong>${year}</strong> (Manfaat mulai melebihi biaya)`;
+        infoDiv.innerHTML = `<strong>Tahun Break-Even:</strong> ${year} — Manfaat mulai melebihi biaya`;
         infoDiv.style.display = 'block';
     } else {
         infoDiv.innerHTML = '';

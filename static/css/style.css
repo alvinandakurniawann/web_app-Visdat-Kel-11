@@ -6,8 +6,8 @@
 }
 
 body {
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+    background: #f5f7fa;
     min-height: 100vh;
     padding: 20px;
 }
@@ -16,28 +16,34 @@ body {
     max-width: 1400px;
     margin: 0 auto;
     background: white;
-    border-radius: 15px;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     overflow: hidden;
+    border: 1px solid #e1e8ed;
 }
 
 header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #2c3e50;
     color: white;
-    padding: 30px;
+    padding: 40px 30px;
     text-align: center;
+    border-bottom: 3px solid #34495e;
 }
 
 header h1 {
-    font-size: 2.5em;
-    margin-bottom: 10px;
-    font-weight: 700;
+    font-size: 2.2em;
+    margin-bottom: 12px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
 }
 
 .subtitle {
-    font-size: 1.1em;
-    opacity: 0.95;
-    font-weight: 300;
+    font-size: 1em;
+    opacity: 0.9;
+    font-weight: 400;
+    line-height: 1.6;
+    max-width: 900px;
+    margin: 0 auto;
 }
 
 main {
@@ -46,13 +52,15 @@ main {
 
 /* Controls Section */
 .controls-section {
-    background: #f8f9fa;
-    padding: 25px;
-    border-radius: 10px;
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 6px;
     margin-bottom: 30px;
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
     gap: 20px;
+    border: 1px solid #e1e8ed;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
 }
 
 .control-group {
@@ -79,26 +87,29 @@ main {
 #year-slider::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
-    background: #667eea;
+    background: #3498db;
     cursor: pointer;
+    border: 2px solid white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 #year-slider::-moz-range-thumb {
-    width: 20px;
-    height: 20px;
+    width: 18px;
+    height: 18px;
     border-radius: 50%;
-    background: #667eea;
+    background: #3498db;
     cursor: pointer;
-    border: none;
+    border: 2px solid white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
 }
 
 #year-display {
-    font-weight: 700;
-    color: #667eea;
-    font-size: 1.2em;
+    font-weight: 600;
+    color: #2c3e50;
+    font-size: 1.1em;
 }
 
 select {
@@ -112,7 +123,7 @@ select {
 }
 
 select:hover, select:focus {
-    border-color: #667eea;
+    border-color: #3498db;
     outline: none;
 }
 
@@ -148,33 +159,33 @@ select:hover, select:focus {
 }
 
 .focus-button {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #3498db;
     color: white;
     border: none;
     padding: 10px 20px;
-    border-radius: 5px;
+    border-radius: 4px;
     cursor: pointer;
-    font-size: 0.95em;
-    font-weight: 600;
-    transition: transform 0.2s, box-shadow 0.2s;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: background-color 0.2s, box-shadow 0.2s;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12);
 }
 
 .focus-button:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+    background: #2980b9;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .focus-button:active {
-    transform: translateY(0);
+    background: #21618c;
 }
 
 .map-container {
     height: 600px;
-    border-radius: 10px;
+    border-radius: 6px;
     overflow: hidden;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    border: 2px solid #e0e0e0;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border: 1px solid #d5d8dc;
 }
 
 /* Make Leaflet popup non-interactive (tidak bisa diklik, tidak menghalangi cursor) */
@@ -275,12 +286,15 @@ select:hover, select:focus {
 }
 
 .map-note {
-    margin-top: 10px;
-    color: #666;
-    font-style: italic;
-    padding: 10px;
-    background: #f0f0f0;
-    border-radius: 5px;
+    margin-top: 12px;
+    color: #5d6d7e;
+    font-style: normal;
+    padding: 12px;
+    background: #f8f9fa;
+    border-radius: 4px;
+    font-size: 0.9em;
+    line-height: 1.5;
+    border-left: 3px solid #95a5a6;
 }
 
 /* Charts Section */
@@ -291,10 +305,11 @@ select:hover, select:focus {
 }
 
 .chart-container {
-    background: #f8f9fa;
-    padding: 25px;
-    border-radius: 10px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    background: #ffffff;
+    padding: 24px;
+    border-radius: 6px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+    border: 1px solid #e1e8ed;
 }
 
 .chart-container h2 {
@@ -309,21 +324,24 @@ select:hover, select:focus {
 
 .break-even-info {
     margin-top: 15px;
-    padding: 15px;
-    background: #e3f2fd;
-    border-left: 4px solid #2196f3;
-    border-radius: 5px;
-    font-weight: 600;
-    color: #1976d2;
+    padding: 12px 16px;
+    background: #ecf0f1;
+    border-left: 4px solid #3498db;
+    border-radius: 4px;
+    font-weight: 500;
+    color: #2c3e50;
+    font-size: 0.95em;
 }
 
 /* Footer */
 footer {
-    background: #333;
-    color: white;
+    background: #2c3e50;
+    color: #ecf0f1;
     text-align: center;
-    padding: 20px;
+    padding: 24px;
     margin-top: 40px;
+    font-size: 0.9em;
+    border-top: 1px solid #34495e;
 }
 
 /* Responsive Design */
