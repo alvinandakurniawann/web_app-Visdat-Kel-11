@@ -1,0 +1,148 @@
+/**
+ * Main JavaScript Module
+ * Mengkoordinasikan semua modul dan menangani interaksi user
+ */
+
+// Note: currentSelectedLA is declared in map.js to avoid duplicate declaration
+
+// Make sure functions are available immediately (not waiting for DOMContentLoaded)
+// These functions are called from inline HTML handlers
+
+/**
+ * Update year from slider
+ */
+function updateYear(year) {
+    if (typeof config === 'undefined') {
+        console.error('Config not loaded yet');
+        return;
+    }
+    
+    config.currentYear = parseInt(year);
+    const yearDisplay = document.getElementById('year-display');
+    if (yearDisplay) {
+        yearDisplay.textContent = year;
+    }
+    
+    // Update map
+    if (typeof mapModule !== 'undefined' && mapModule.updateMap) {
+        mapModule.updateMap(config.currentYear, config.currentBenefitType);
+    } else if (typeof updateMap === 'function') {
+        updateMap(config.currentYear, config.currentBenefitType);
+    }
+    
+    // Update charts
+    updateChart();
+}
+
+/**
+ * Update benefit type for map
+ */
+function updateBenefitType(benefitType) {
+    if (typeof config === 'undefined') {
+        console.error('Config not loaded yet');
+        return;
+    }
+    
+    config.currentBenefitType = benefitType;
+    
+    // Update map
+    if (typeof mapModule !== 'undefined' && mapModule.updateMap) {
+        mapModule.updateMap(config.currentYear, config.currentBenefitType);
+    } else if (typeof updateMap === 'function') {
+        updateMap(config.currentYear, config.currentBenefitType);
+    }
+}
+
+/**
+ * Update selected local authority
+ */
+function updateLocalAuthority(localAuthority) {
+    if (typeof config === 'undefined') {
+        console.error('Config not loaded yet');
+        return;
+    }
+    
+    config.currentLocalAuthority = localAuthority;
+    
+    // Update currentSelectedLA in map module
+    if (typeof window !== 'undefined') {
+        window.currentSelectedLA = localAuthority;
+    }
+    
+    // Highlight area on map (without panning - user must click focus button to pan)
+    if (typeof highlightAreaByName === 'function') {
+        highlightAreaByName(localAuthority, false);
+    } else if (typeof mapModule !== 'undefined' && mapModule.highlightAreaByName) {
+        mapModule.highlightAreaByName(localAuthority, false);
+    }
+    
+    // Show focus button
+    const focusButton = document.getElementById('focus-button');
+    if (focusButton) {
+        focusButton.style.display = 'block';
+    }
+    
+    updateChart();
+}
+
+/**
+ * Update chart based on current selections
+ */
+function updateChart() {
+    if (typeof config === 'undefined') {
+        console.error('Config not loaded yet');
+        return;
+    }
+    
+    // Get selected benefit types from checkboxes
+    const checkboxes = document.querySelectorAll('.benefit-checkbox:checked');
+    if (checkboxes.length > 0) {
+        config.selectedBenefitTypes = Array.from(checkboxes).map(cb => cb.value);
+    }
+    
+    // Reload chart data
+    if (typeof chartsModule !== 'undefined' && chartsModule.loadChartData) {
+        chartsModule.loadChartData();
+    } else if (typeof loadChartData === 'function') {
+        loadChartData();
+    }
+}
+
+// Make functions globally available immediately
+window.updateYear = updateYear;
+window.updateBenefitType = updateBenefitType;
+window.updateLocalAuthority = updateLocalAuthority;
+window.updateChart = updateChart;
+
+// Initialize when DOM is ready
+document.addEventListener('DOMContentLoaded', function() {
+    // Wait a bit for config to be available
+    setTimeout(() => {
+        // Initialize map
+        if (typeof mapModule !== 'undefined' && mapModule.initMap) {
+            mapModule.initMap();
+        } else if (typeof initMap === 'function') {
+            initMap();
+        }
+        
+        // Initialize charts
+        if (typeof chartsModule !== 'undefined' && chartsModule.initCharts) {
+            chartsModule.initCharts();
+        } else if (typeof initCharts === 'function') {
+            initCharts();
+        }
+        
+        // Set initial selected local authority
+        if (typeof config !== 'undefined' && config.currentLocalAuthority) {
+            if (typeof window !== 'undefined') {
+                window.currentSelectedLA = config.currentLocalAuthority;
+            }
+            setTimeout(() => {
+                const focusButton = document.getElementById('focus-button');
+                if (focusButton) {
+                    focusButton.style.display = 'block';
+                }
+            }, 1500);
+        }
+    }, 100);
+});

@@ -1,0 +1,102 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - Visualisasi Data{% endblock %}
+
+{% block content %}
+<div class="dashboard">
+    <!-- Controls Section -->
+    <section class="controls-section">
+        <div class="control-group">
+            <label for="year-slider">Tahun:</label>
+            <input type="range" id="year-slider" 
+                   min="{{ min_year }}" max="{{ max_year }}" 
+                   value="{{ min_year }}" 
+                   oninput="updateYear(this.value)">
+            <span id="year-display">{{ min_year }}</span>
+        </div>
+        
+        <div class="control-group">
+            <label for="benefit-type-select">Parameter Peta:</label>
+            <select id="benefit-type-select" onchange="updateBenefitType(this.value)">
+                {% for bt, label in benefit_labels.items() %}
+                <option value="{{ bt }}">{{ label }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="control-group">
+            <label for="local-authority-select">Local Authority:</label>
+            <select id="local-authority-select" onchange="updateLocalAuthority(this.value)">
+                {% for la in local_authorities %}
+                <option value="{{ la }}">{{ la }}</option>
+                {% endfor %}
+            </select>
+        </div>
+        
+        <div class="control-group">
+            <label>Parameter Grafik:</label>
+            <div class="checkbox-group">
+                {% for bt, label in benefit_labels.items() %}
+                <label class="checkbox-label">
+                    <input type="checkbox" class="benefit-checkbox" 
+                           value="{{ bt }}" checked 
+                           onchange="updateChart()">
+                    {{ label }}
+                </label>
+                {% endfor %}
+            </div>
+        </div>
+    </section>
+    
+    <!-- Map Section -->
+    <section class="map-section">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+            <h2 style="margin: 0;">Komponen 1 — Peta Koroplet Interaktif</h2>
+            <button id="focus-button" onclick="focusToSelectedArea()" class="focus-button" style="display: none;">
+                🎯 Fokus ke Local Authority Terpilih
+            </button>
+        </div>
+        <div id="map" class="map-container"></div>
+        <p class="map-note">
+            <strong>Catatan:</strong> Klik pada wilayah di peta untuk memilih Local Authority. Wilayah terpilih akan ditandai dengan warna orange.
+        </p>
+    </section>
+    
+    <!-- Charts Section -->
+    <section class="charts-section">
+        <div class="chart-container">
+            <h2>Komponen 2 — Grafik Garis Tren Temporal</h2>
+            <canvas id="line-chart"></canvas>
+            <div id="break-even-info" class="break-even-info"></div>
+        </div>
+        
+        <div class="chart-container">
+            <h2>Komponen 3 — Grafik Area Akumulatif</h2>
+            <canvas id="area-chart"></canvas>
+        </div>
+    </section>
+</div>
+
+<script>
+// Configuration data dari server
+const config = {
+    localAuthorities: {{ local_authorities | tojson }},
+    years: {{ years | tojson }},
+    benefitTypes: {{ benefit_types | tojson }},
+    benefitLabels: {{ benefit_labels | tojson }},
+    matchingProperty: {{ matching_property | tojson if matching_property else 'null' }},
+    minYear: {{ min_year }},
+    maxYear: {{ max_year }},
+    currentYear: {{ min_year }},
+    currentBenefitType: '{{ benefit_types[0] }}',
+    currentLocalAuthority: '{{ local_authorities[0] }}',
+    selectedBenefitTypes: {{ benefit_types | tojson }}
+};
+</script>
+
+<!-- Load scripts in correct order -->
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+<script src="{{ url_for('static', filename='js/map.js') }}"></script>
+<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+{% endblock %}
+
