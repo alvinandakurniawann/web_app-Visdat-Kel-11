@@ -18,6 +18,7 @@ class DataLoader:
         self._data = None
         self._geojson = None
         self._meta = None
+        # Lazy loading - data akan di-load saat pertama kali diakses
     
     @property
     def data(self):

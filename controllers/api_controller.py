@@ -141,7 +141,10 @@ class APIController:
         """Get GeoJSON data"""
         try:
             geojson = self.data_loader.geojson
-            return jsonify(geojson)
+            response = jsonify(geojson)
+            # Add cache headers untuk GeoJSON (jarang berubah)
+            response.headers['Cache-Control'] = 'public, max-age=3600'
+            return response
         except Exception as e:
             return jsonify({
                 'success': False,

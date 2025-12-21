@@ -45,7 +45,8 @@ Thumbs.db
 # Documentation
 INSTALLATION.md
 COMPLIANCE_CHECK.md
+DEPLOYMENT.md
+VERCEL_DEPLOY.md
 
 # Scripts (untuk maintenance/checking data, bukan bagian dari website)
 scripts/
-

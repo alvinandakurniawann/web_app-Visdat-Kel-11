@@ -4,6 +4,7 @@ Main application file untuk web visualization dashboard
 """
 from flask import Flask, render_template, jsonify
 import sys
+import os
 from pathlib import Path
 
 # Add web_app to path
@@ -16,8 +17,12 @@ from controllers.api_controller import APIController
 
 def create_app(config_class=Config):
     """Application factory pattern untuk membuat Flask app"""
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder='static', static_url_path='/static')
     app.config.from_object(config_class)
+    
+    # Disable debug mode untuk production (Vercel)
+    if os.environ.get('VERCEL'):
+        app.config['DEBUG'] = False
     
     # Initialize data loader
     data_loader = DataLoader()
@@ -32,7 +37,9 @@ def create_app(config_class=Config):
     
     return app
 
+# Create app instance for Vercel
+app = create_app()
+
 if __name__ == '__main__':
-    app = create_app()
     app.run(debug=True, host='0.0.0.0', port=5000)
 
