@@ -126,35 +126,50 @@ window.updateMapBenefitTypes = updateMapBenefitTypes;
 window.updateLocalAuthority = updateLocalAuthority;
 window.updateChart = updateChart;
 
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', function() {
-    // Wait a bit for config to be available
-    setTimeout(() => {
-        // Initialize map
-        if (typeof mapModule !== 'undefined' && mapModule.initMap) {
-            mapModule.initMap();
-        } else if (typeof initMap === 'function') {
-            initMap();
+/**
+ * Initialize application after config is loaded
+ */
+function initializeApp() {
+    if (!config) {
+        console.error('Config not available');
+        return;
+    }
+    
+    // Initialize map
+    if (typeof mapModule !== 'undefined' && mapModule.initMap) {
+        mapModule.initMap();
+    } else if (typeof initMap === 'function') {
+        initMap();
+    }
+    
+    // Initialize charts
+    if (typeof chartsModule !== 'undefined' && chartsModule.initCharts) {
+        chartsModule.initCharts();
+    } else if (typeof initCharts === 'function') {
+        initCharts();
+    }
+    
+    // Set initial selected local authority
+    if (config.currentLocalAuthority) {
+        if (typeof window !== 'undefined') {
+            window.currentSelectedLA = config.currentLocalAuthority;
         }
-        
-        // Initialize charts
-        if (typeof chartsModule !== 'undefined' && chartsModule.initCharts) {
-            chartsModule.initCharts();
-        } else if (typeof initCharts === 'function') {
-            initCharts();
-        }
-        
-        // Set initial selected local authority
-        if (typeof config !== 'undefined' && config.currentLocalAuthority) {
-            if (typeof window !== 'undefined') {
-                window.currentSelectedLA = config.currentLocalAuthority;
+        setTimeout(() => {
+            const focusButton = document.getElementById('focus-button');
+            if (focusButton) {
+                focusButton.style.display = 'block';
             }
-            setTimeout(() => {
-                const focusButton = document.getElementById('focus-button');
-                if (focusButton) {
-                    focusButton.style.display = 'block';
-                }
-            }, 1500);
-        }
-    }, 100);
+        }, 1500);
+    }
+}
+
+// Make initializeApp globally available
+window.initializeApp = initializeApp;
+
+// Initialize when DOM is ready (fallback if config loads before DOM)
+document.addEventListener('DOMContentLoaded', function() {
+    // If config is already loaded, initialize immediately
+    if (config) {
+        initializeApp();
+    }
 });

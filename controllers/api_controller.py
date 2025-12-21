@@ -17,6 +17,7 @@ class APIController:
     
     def _register_routes(self):
         """Register all API routes"""
+        self.bp.add_url_rule('/config', 'config', self.get_config, methods=['GET'])
         self.bp.add_url_rule('/map-data', 'map_data', self.get_map_data, methods=['GET'])
         self.bp.add_url_rule('/chart-data', 'chart_data', self.get_chart_data, methods=['GET'])
         self.bp.add_url_rule('/cumulative-data', 'cumulative_data', self.get_cumulative_data, methods=['GET'])
@@ -158,6 +159,53 @@ class APIController:
             return jsonify({
                 'success': True,
                 'data': authorities
+            })
+        except Exception as e:
+            return jsonify({
+                'success': False,
+                'error': str(e)
+            }), 400
+    
+    def get_config(self):
+        """Get application configuration"""
+        try:
+            from models.data_normalizer import DataNormalizer
+            from config import Config
+            
+            local_authorities = self.data_loader.get_local_authorities()
+            years = self.data_loader.get_years()
+            benefit_types = self.data_loader.get_benefit_types()
+            
+            # Get benefit type labels
+            benefit_labels = {
+                bt: Config.BENEFIT_TYPES.get(bt, bt)
+                for bt in benefit_types
+            }
+            
+            # Find matching property in GeoJSON
+            normalizer = DataNormalizer()
+            geojson = self.data_loader.geojson
+            matching_property = normalizer.find_matching_property(
+                geojson,
+                local_authorities
+            )
+            
+            return jsonify({
+                'success': True,
+                'config': {
+                    'localAuthorities': local_authorities,
+                    'years': years,
+                    'benefitTypes': benefit_types,
+                    'benefitLabels': benefit_labels,
+                    'matchingProperty': matching_property,
+                    'minYear': min(years),
+                    'maxYear': max(years),
+                    'currentYear': min(years),
+                    'currentBenefitTypes': benefit_types,
+                    'currentLocalAuthority': local_authorities[0] if local_authorities else '',
+                    'selectedBenefitTypes': benefit_types,
+                    'selectedMapBenefitTypes': ['air_quality']
+                }
             })
         except Exception as e:
             return jsonify({
