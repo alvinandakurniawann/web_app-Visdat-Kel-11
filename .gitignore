@@ -46,3 +46,6 @@ Thumbs.db
 INSTALLATION.md
 COMPLIANCE_CHECK.md
 
+# Scripts (untuk maintenance/checking data, bukan bagian dari website)
+scripts/
+
