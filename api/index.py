@@ -13,5 +13,9 @@ from app import app
 
 # Export handler untuk Vercel
 # Vercel akan otomatis menggunakan WSGI adapter untuk Flask app
+# Handler harus diekspor dengan nama 'handler' atau 'app'
 handler = app
+
+# Alternative: export app directly (Vercel will auto-detect)
+__all__ = ['handler', 'app']
 
