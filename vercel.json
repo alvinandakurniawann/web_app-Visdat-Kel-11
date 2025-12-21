@@ -10,11 +10,11 @@
     },
     {
       "src": "/(.*)",
-      "dest": "app.py"
+      "dest": "/api/index"
     }
   ],
   "functions": {
-    "app.py": {
+    "api/index.py": {
       "maxDuration": 30
     }
   }
