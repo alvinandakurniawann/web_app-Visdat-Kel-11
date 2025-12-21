@@ -1,104 +1,275 @@
-{% extends "base.html" %}
-
-{% block title %}Dashboard - Visualisasi Data{% endblock %}
-
-{% block content %}
-<div class="dashboard">
-    <!-- Controls Section -->
-    <section class="controls-section">
-        <div class="control-group">
-            <label for="year-slider">Tahun:</label>
-            <input type="range" id="year-slider" 
-                   min="{{ min_year }}" max="{{ max_year }}" 
-                   value="{{ min_year }}" 
-                   oninput="updateYear(this.value)">
-            <span id="year-display">{{ min_year }}</span>
+{% extends "base.html" %} {% block title %}Dashboard - Visualisasi Data{%
+endblock %} {% block content %}
+<!-- Hero Section -->
+<section
+  id="home"
+  class="hero-section bg-gradient-primary text-white py-5 mb-5"
+>
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-8">
+        <h1 class="display-4 fw-bold mb-3">Dashboard Interaktif</h1>
+        <p class="lead mb-4">
+          Evaluasi Trade-Off Temporal antara Biaya Jangka Pendek dan Manfaat
+          Kesehatan Jangka Panjang dari Aksi Iklim di UK
+        </p>
+        <div class="d-flex gap-3">
+          <button
+            class="btn btn-light btn-lg"
+            onclick="document.getElementById('map-section').scrollIntoView({behavior: 'smooth'})"
+          >
+            <i class="fas fa-map-marked-alt me-2"></i>Lihat Peta
+          </button>
+          <button
+            class="btn btn-outline-light btn-lg"
+            onclick="document.getElementById('charts-section').scrollIntoView({behavior: 'smooth'})"
+          >
+            <i class="fas fa-chart-line me-2"></i>Lihat Grafik
+          </button>
         </div>
-        
-        <div class="control-group">
-            <label>Parameter Peta:</label>
-            <div class="checkbox-group">
-                {% for bt, label in benefit_labels.items() %}
-                <label class="checkbox-label">
-                    <input type="checkbox" class="map-benefit-checkbox" 
-                           value="{{ bt }}" {% if bt == 'air_quality' %}checked{% endif %}
-                           onchange="updateMapBenefitTypes()">
-                    {{ label }}
-                </label>
-                {% endfor %}
+      </div>
+      <div class="col-lg-4 text-center">
+        <div class="hero-icon">
+          <i class="fas fa-globe-americas fa-6x text-white opacity-75"></i>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Stats Cards -->
+<section class="stats-section mb-5">
+  <div class="container">
+    <div class="row g-4">
+      <div class="col-md-3">
+        <div class="card stats-card border-0 shadow-sm h-100">
+          <div class="card-body text-center">
+            <div class="stats-icon mb-3">
+              <i class="fas fa-calendar-alt fa-2x text-primary"></i>
             </div>
+            <h3 class="h2 mb-1">{{ max_year - min_year + 1 }}</h3>
+            <p class="text-muted mb-0">Tahun Data</p>
+          </div>
         </div>
-        
-        <div class="control-group">
-            <label for="local-authority-select">Local Authority:</label>
-            <select id="local-authority-select" onchange="updateLocalAuthority(this.value)">
+      </div>
+      <div class="col-md-3">
+        <div class="card stats-card border-0 shadow-sm h-100">
+          <div class="card-body text-center">
+            <div class="stats-icon mb-3">
+              <i class="fas fa-map-marker-alt fa-2x text-success"></i>
+            </div>
+            <h3 class="h2 mb-1">{{ local_authorities|length }}</h3>
+            <p class="text-muted mb-0">Local Authority</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card stats-card border-0 shadow-sm h-100">
+          <div class="card-body text-center">
+            <div class="stats-icon mb-3">
+              <i class="fas fa-chart-bar fa-2x text-warning"></i>
+            </div>
+            <h3 class="h2 mb-1">{{ benefit_types|length }}</h3>
+            <p class="text-muted mb-0">Parameter</p>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card stats-card border-0 shadow-sm h-100">
+          <div class="card-body text-center">
+            <div class="stats-icon mb-3">
+              <i class="fas fa-leaf fa-2x text-info"></i>
+            </div>
+            <h3 class="h2 mb-1">United Kingdom</h3>
+            <p class="text-muted mb-0">Lokasi</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="dashboard">
+  <!-- Controls Section -->
+  <section class="controls-section mb-5">
+    <div class="card shadow-sm">
+      <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-sliders-h me-2"></i>Kontrol Dashboard
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row g-4">
+          <div class="col-md-6 col-lg-3">
+            <div class="control-group">
+              <label for="year-slider" class="form-label fw-semibold"
+                >Tahun:</label
+              >
+              <input
+                type="range"
+                id="year-slider"
+                min="{{ min_year }}"
+                max="{{ max_year }}"
+                value="{{ min_year }}"
+                class="form-range"
+                oninput="updateYear(this.value)"
+              />
+              <div class="d-flex justify-content-between">
+                <small class="text-muted">{{ min_year }}</small>
+                <span id="year-display" class="badge bg-primary fs-6"
+                  >{{ min_year }}</span
+                >
+                <small class="text-muted">{{ max_year }}</small>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-lg-3">
+            <div class="control-group">
+              <label class="form-label fw-semibold">Parameter Peta:</label>
+              <div class="checkbox-group">
+                {% for bt, label in benefit_labels.items() %}
+                <div class="form-check">
+                  <input type="checkbox" class="form-check-input
+                  map-benefit-checkbox" value="{{ bt }}" {% if bt ==
+                  'air_quality' %}checked{% endif %}
+                  onchange="updateMapBenefitTypes()" id="map-{{ bt }}">
+                  <label class="form-check-label" for="map-{{ bt }}"
+                    >{{ label }}</label
+                  >
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-lg-3">
+            <div class="control-group">
+              <label for="local-authority-select" class="form-label fw-semibold"
+                >Local Authority:</label
+              >
+              <select
+                id="local-authority-select"
+                class="form-select"
+                onchange="updateLocalAuthority(this.value)"
+              >
                 {% for la in local_authorities %}
                 <option value="{{ la }}">{{ la }}</option>
                 {% endfor %}
-            </select>
-        </div>
-        
-        <div class="control-group">
-            <label>Parameter Grafik:</label>
-            <div class="checkbox-group">
-                {% for bt, label in benefit_labels.items() %}
-                <label class="checkbox-label">
-                    <input type="checkbox" class="benefit-checkbox" 
-                           value="{{ bt }}" checked 
-                           onchange="updateChart()">
-                    {{ label }}
-                </label>
-                {% endfor %}
+              </select>
             </div>
+          </div>
+
+          <div class="col-md-6 col-lg-3">
+            <div class="control-group">
+              <label class="form-label fw-semibold">Parameter Grafik:</label>
+              <div class="checkbox-group">
+                {% for bt, label in benefit_labels.items() %}
+                <div class="form-check">
+                  <input
+                    type="checkbox"
+                    class="form-check-input benefit-checkbox"
+                    value="{{ bt }}"
+                    checked
+                    onchange="updateChart()"
+                    id="chart-{{ bt }}"
+                  />
+                  <label class="form-check-label" for="chart-{{ bt }}"
+                    >{{ label }}</label
+                  >
+                </div>
+                {% endfor %}
+              </div>
+            </div>
+          </div>
         </div>
-    </section>
-    
-    <!-- Map Section -->
-    <section class="map-section">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-            <h2 style="margin: 0;">Komponen 1 — Peta Koroplet Interaktif</h2>
-            <button id="focus-button" onclick="focusToSelectedArea()" class="focus-button" style="display: none;">
-                Fokus ke Local Authority Terpilih
-            </button>
+      </div>
+    </div>
+  </section>
+
+  <!-- Map Section -->
+  <section class="map-section mb-5" id="map-section">
+    <div class="card shadow-sm">
+      <div
+        class="card-header bg-success text-white d-flex justify-content-between align-items-center"
+      >
+        <h5 class="card-title mb-0">
+          <i class="fas fa-map-marked-alt me-2"></i>Peta Koroplet Interaktif
+        </h5>
+        <button
+          id="focus-button"
+          onclick="focusToSelectedArea()"
+          class="btn btn-light btn-sm"
+          style="display: none"
+        >
+          <i class="fas fa-crosshairs me-1"></i>Fokus Area
+        </button>
+      </div>
+      <div class="card-body">
+        <div id="map" class="map-container rounded"></div>
+        <div class="alert alert-info mt-3">
+          <strong><i class="fas fa-info-circle me-1"></i>Catatan:</strong> Klik
+          pada wilayah di peta untuk memilih Local Authority. Wilayah terpilih
+          akan ditandai dengan warna orange.<br />
+          <strong>Penjelasan Nilai:</strong> Nilai yang ditampilkan di peta
+          adalah jumlah dari semua parameter yang dipilih. Jika hanya satu
+          parameter dipilih, nilai tersebut adalah nilai untuk parameter
+          tersebut saja. Jika beberapa parameter dipilih, nilai adalah jumlah
+          dari semua parameter tersebut (benefit ditambah, cost dikurangi).
         </div>
-        <div id="map" class="map-container"></div>
-        <p class="map-note">
-            <strong>Catatan:</strong> Klik pada wilayah di peta untuk memilih Local Authority. Wilayah terpilih akan ditandai dengan warna orange.<br>
-            <strong>Penjelasan Nilai:</strong> Nilai yang ditampilkan di peta adalah jumlah dari semua parameter yang dipilih. Jika hanya satu parameter dipilih, nilai tersebut adalah nilai untuk parameter tersebut saja. Jika beberapa parameter dipilih, nilai adalah jumlah dari semua parameter tersebut (benefit ditambah, cost dikurangi).
-        </p>
-    </section>
-    
-    <!-- Charts Section -->
-    <section class="charts-section">
-        <div class="chart-container">
-            <h2>Komponen 2 — Grafik Garis Tren Temporal</h2>
+      </div>
+    </div>
+  </section>
+
+  <!-- Charts Section -->
+  <section class="charts-section" id="charts-section">
+    <div class="row g-4">
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-header bg-warning text-dark">
+            <h5 class="card-title mb-0">
+              <i class="fas fa-chart-line me-2"></i>Grafik Garis Tren Temporal
+            </h5>
+          </div>
+          <div class="card-body">
             <canvas id="line-chart"></canvas>
-            <div id="break-even-info" class="break-even-info"></div>
+            <div id="break-even-info" class="alert alert-primary mt-3"></div>
+          </div>
         </div>
-        
-        <div class="chart-container">
-            <h2>Komponen 3 — Grafik Area Akumulatif</h2>
+      </div>
+
+      <div class="col-12">
+        <div class="card shadow-sm">
+          <div class="card-header bg-info text-white">
+            <h5 class="card-title mb-0">
+              <i class="fas fa-chart-area me-2"></i>Grafik Area Akumulatif
+            </h5>
+          </div>
+          <div class="card-body">
             <canvas id="area-chart"></canvas>
+          </div>
         </div>
-    </section>
+      </div>
+    </div>
+  </section>
 </div>
 
 <script>
-// Configuration data dari server
-const config = {
-    localAuthorities: {{ local_authorities | tojson }},
-    years: {{ years | tojson }},
-    benefitTypes: {{ benefit_types | tojson }},
-    benefitLabels: {{ benefit_labels | tojson }},
-    matchingProperty: {{ matching_property | tojson if matching_property else 'null' }},
-    minYear: {{ min_year }},
-    maxYear: {{ max_year }},
-    currentYear: {{ min_year }},
-    currentBenefitTypes: {{ benefit_types | tojson }},
-    currentLocalAuthority: '{{ local_authorities[0] }}',
-    selectedBenefitTypes: {{ benefit_types | tojson }},
-    selectedMapBenefitTypes: ['air_quality']
-};
+  // Configuration data dari server
+  const config = {
+      localAuthorities: {{ local_authorities | tojson }},
+      years: {{ years | tojson }},
+      benefitTypes: {{ benefit_types | tojson }},
+      benefitLabels: {{ benefit_labels | tojson }},
+      matchingProperty: {{ matching_property | tojson if matching_property else 'null' }},
+      minYear: {{ min_year }},
+      maxYear: {{ max_year }},
+      currentYear: {{ min_year }},
+      currentBenefitTypes: {{ benefit_types | tojson }},
+      currentLocalAuthority: '{{ local_authorities[0] }}',
+      selectedBenefitTypes: {{ benefit_types | tojson }},
+      selectedMapBenefitTypes: ['air_quality']
+  };
 </script>
 
 <!-- Load scripts in correct order -->
@@ -106,4 +277,3 @@ const config = {
 <script src="{{ url_for('static', filename='js/map.js') }}"></script>
 <script src="{{ url_for('static', filename='js/charts.js') }}"></script>
 {% endblock %}
-
