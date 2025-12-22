@@ -3,7 +3,7 @@ endblock %} {% block content %}
 <!-- Hero Section -->
 <section
   id="home"
-  class="hero-section bg-gradient-primary text-white py-5 mb-5"
+  class="hero-section bg-gradient-primary text-white py-5 mb-5 fade-in"
 >
   <div class="container">
     <div class="row align-items-center">
@@ -38,7 +38,7 @@ endblock %} {% block content %}
 </section>
 
 <!-- Stats Cards -->
-<section class="stats-section mb-5">
+<section class="stats-section mb-5 fade-in">
   <div class="container">
     <div class="row g-4">
       <div class="col-md-3">
@@ -91,7 +91,7 @@ endblock %} {% block content %}
 
 <div class="dashboard">
   <!-- Controls Section -->
-  <section class="controls-section mb-5">
+  <section class="controls-section mb-5 fade-in">
     <div class="card shadow-sm">
       <div class="card-header bg-primary text-white">
         <h5 class="card-title mb-0">
@@ -113,6 +113,8 @@ endblock %} {% block content %}
                 value="{{ min_year }}"
                 class="form-range"
                 oninput="updateYear(this.value)"
+                data-bs-toggle="tooltip"
+                title="Geser untuk memilih tahun data"
               />
               <div class="d-flex justify-content-between">
                 <small class="text-muted">{{ min_year }}</small>
@@ -134,7 +136,11 @@ endblock %} {% block content %}
                   map-benefit-checkbox" value="{{ bt }}" {% if bt ==
                   'air_quality' %}checked{% endif %}
                   onchange="updateMapBenefitTypes()" id="map-{{ bt }}">
-                  <label class="form-check-label" for="map-{{ bt }}"
+                  <label
+                    class="form-check-label"
+                    for="map-{{ bt }}"
+                    data-bs-toggle="tooltip"
+                    title="Centang untuk menampilkan {{ label }} di peta"
                     >{{ label }}</label
                   >
                 </div>
@@ -152,6 +158,8 @@ endblock %} {% block content %}
                 id="local-authority-select"
                 class="form-select"
                 onchange="updateLocalAuthority(this.value)"
+                data-bs-toggle="tooltip"
+                title="Pilih local authority untuk fokus data"
               >
                 {% for la in local_authorities %}
                 <option value="{{ la }}">{{ la }}</option>
@@ -188,7 +196,7 @@ endblock %} {% block content %}
   </section>
 
   <!-- Map Section -->
-  <section class="map-section mb-5" id="map-section">
+  <section class="map-section mb-5 fade-in" id="map-section">
     <div class="card shadow-sm">
       <div
         class="card-header bg-success text-white d-flex justify-content-between align-items-center"
@@ -222,7 +230,7 @@ endblock %} {% block content %}
   </section>
 
   <!-- Charts Section -->
-  <section class="charts-section" id="charts-section">
+  <section class="charts-section fade-in" id="charts-section">
     <div class="row g-4">
       <div class="col-12">
         <div class="card shadow-sm">
