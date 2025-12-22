@@ -257,23 +257,23 @@ endblock %} {% block content %}
 <script>
   // Configuration data akan dimuat dari API
   let config = null;
-  
+
   // Load configuration from API
-  (async function() {
+  (async function () {
     try {
-      const response = await fetch('/api/config');
+      const response = await fetch("/api/config");
       const result = await response.json();
       if (result.success) {
         config = result.config;
         // Initialize application setelah config dimuat
-        if (typeof initializeApp === 'function') {
+        if (typeof initializeApp === "function") {
           initializeApp();
         }
       } else {
-        console.error('Error loading config:', result.error);
+        console.error("Error loading config:", result.error);
       }
     } catch (error) {
-      console.error('Error loading config:', error);
+      console.error("Error loading config:", error);
     }
   })();
 </script>
