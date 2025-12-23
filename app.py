@@ -40,8 +40,8 @@ def create_app(config_class=Config):
 # Create app instance for Vercel
 app = create_app()
 
-# Export app untuk Vercel
-# Vercel akan otomatis menggunakan WSGI adapter untuk Flask app
+#  Export app untuk Vercel
+#  Vercel akan otomatis menggunakan WSGI adapter untuk Flask app
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)
 
